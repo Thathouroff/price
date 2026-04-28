@@ -2,8 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#0a0e14">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Сравнение цен — Калькулятор выгодной покупки</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -27,11 +26,9 @@
             --accent-glow: rgba(124, 138, 255, 0.15);
             --green: #4ade80;
             --green-glow: rgba(74, 222, 128, 0.12);
-            --yellow: #facc15;
             --red: #f87171;
             --radius: 16px;
             --radius-sm: 12px;
-            --radius-xs: 8px;
         }
 
         body {
@@ -78,12 +75,6 @@
 
         .mode-header:hover {
             background: rgba(255,255,255,0.02);
-        }
-
-        .mode-header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .mode-title {
@@ -319,11 +310,6 @@
             font-weight: 500;
         }
 
-        .badges-container {
-            display: flex;
-            gap: 6px;
-        }
-
         .best-badge {
             display: inline-flex;
             align-items: center;
@@ -340,6 +326,12 @@
         @keyframes badgePop {
             0% { transform: scale(0.8); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
+        }
+
+        .worse-badge {
+            font-size: 13px;
+            color: var(--red);
+            font-weight: 500;
         }
 
         /* Add Button */
@@ -393,7 +385,39 @@
             text-transform: uppercase;
             letter-spacing: 0.8px;
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+        }
+
+        .summary-verdict {
+            background: var(--green-glow);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin-bottom: 14px;
+        }
+
+        .verdict-main {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--green);
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .verdict-details {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .verdict-detail {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .verdict-detail strong {
+            color: var(--green);
+            font-weight: 600;
         }
 
         .summary-row {
@@ -434,9 +458,46 @@
             margin-left: 6px;
         }
 
-        /* Scrollbar */
+        .summary-bar {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .summary-bar-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .bar-container {
+            height: 6px;
+            background: var(--bg-input);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            background: var(--accent);
+        }
+
+        .bar-fill.best {
+            background: var(--green);
+        }
+
+        .bar-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
         ::-webkit-scrollbar { width: 0; }
-        
+
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button {
             -webkit-appearance: none;
@@ -454,17 +515,18 @@
     <div class="app-container">
         <p class="subtitle">Сравните ценники и узнайте, какой из товаров дешевле.</p>
 
-        <div class="mode-selector open" id="modeSelector">
+        <!-- Mode Selector -->
+        <div class="mode-selector" id="modeSelector">
             <div class="mode-header" id="modeHeader" onclick="toggleModeDropdown()">
                 <div class="mode-header-left">
-                    <div class="mode-title">Сравнить цену <span id="modeDisplayText">за килограмм</span></div>
+                    <div class="mode-title">Сравнить цену <span id="modeDisplayText">за единицу</span></div>
                 </div>
                 <svg class="mode-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="6 9 12 15 18 9"/>
                 </svg>
             </div>
             <div class="mode-options">
-                <div class="mode-option active" data-mode="kg" onclick="setMode('kg')">
+                <div class="mode-option" data-mode="kg" onclick="setMode('kg')">
                     <span class="mode-option-label">за килограмм</span>
                     <div class="radio-circle"></div>
                 </div>
@@ -472,15 +534,17 @@
                     <span class="mode-option-label">за литр</span>
                     <div class="radio-circle"></div>
                 </div>
-                <div class="mode-option" data-mode="unit" onclick="setMode('unit')">
+                <div class="mode-option active" data-mode="unit" onclick="setMode('unit')">
                     <span class="mode-option-label">за единицу</span>
                     <div class="radio-circle"></div>
                 </div>
             </div>
         </div>
 
+        <!-- Products -->
         <div class="products-container" id="productsContainer"></div>
 
+        <!-- Add Button -->
         <button class="add-btn" id="addBtn" onclick="addProduct()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                 <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -488,48 +552,52 @@
             Добавить ещё товар
         </button>
 
+        <!-- Summary -->
         <div class="summary-card" id="summaryCard">
             <div class="summary-title">Итог сравнения</div>
+            <div id="summaryVerdict"></div>
             <div id="summaryContent"></div>
+            <div class="summary-bar" id="summaryBar"></div>
         </div>
     </div>
 
     <script>
-        let currentMode = 'kg';
+        let currentMode = 'unit';
         let products = [];
         let nextId = 1;
 
         const modeConfig = {
             kg: {
                 label: 'за килограмм',
+                inputLabel: 'грамм',
                 inputSuffix: 'г',
                 resultSuffix: '₽/кг',
+                priceDisplay: 'кг',
                 exampleQty: '120'
             },
             liter: {
                 label: 'за литр',
+                inputLabel: 'миллилитров',
                 inputSuffix: 'мл',
                 resultSuffix: '₽/л',
+                priceDisplay: 'л',
                 exampleQty: '120'
             },
             unit: {
-                label: 'за штуку',
+                label: 'за единицу',
+                inputLabel: 'штук',
                 inputSuffix: 'шт',
                 resultSuffix: '₽/шт',
-                exampleQty: '1'
+                priceDisplay: 'шт',
+                exampleQty: '10'
             }
         };
-
-        // Инициализация при загрузке
-        window.onload = () => init();
 
         function init() {
             products = [
                 { id: nextId++, price: '', quantity: '', label: 'Товар 1' },
                 { id: nextId++, price: '', quantity: '', label: 'Товар 2' }
             ];
-            // Закрываем меню по умолчанию для чистоты
-            document.getElementById('modeSelector').classList.remove('open');
             render();
         }
 
@@ -544,7 +612,7 @@
             });
             document.getElementById('modeDisplayText').textContent = modeConfig[mode].label;
             document.getElementById('modeSelector').classList.remove('open');
-            render(); // Перерисовываем суффиксы
+            render();
         }
 
         function addProduct() {
@@ -564,7 +632,9 @@
                 card.classList.add('removing');
                 setTimeout(() => {
                     products = products.filter(p => p.id !== id);
-                    products.forEach((p, i) => p.label = `Товар ${i + 1}`);
+                    products.forEach((p, i) => {
+                        p.label = `Товар ${i + 1}`;
+                    });
                     render();
                 }, 250);
             }
@@ -573,9 +643,8 @@
         function updateProduct(id, field, value) {
             const product = products.find(p => p.id === id);
             if (product) {
-                // Заменяем запятую на точку для корректной математики
-                product[field] = value.replace(',', '.');
-                calculate(); // Не вызываем render(), чтобы не сбивать фокус ввода
+                product[field] = value;
+                calculate();
             }
         }
 
@@ -583,7 +652,6 @@
             const p = parseFloat(price);
             const q = parseFloat(quantity);
             if (!p || !q || isNaN(p) || isNaN(q)) return 0;
-            
             if (currentMode === 'kg' || currentMode === 'liter') {
                 return (p / q) * 1000;
             }
@@ -593,137 +661,206 @@
         function formatPrice(price) {
             if (price === 0) return '0';
             if (price < 1) return price.toFixed(2);
-            if (price < 10) return price.toFixed(1);
+            if (price < 10) return price.toFixed(2);
             return Math.round(price).toString();
         }
 
-        // Отрисовка карточек товаров (вызывается только при добавлении/удалении/смене мода)
+        function formatRubles(value) {
+            if (value < 1) return value.toFixed(2);
+            if (value < 10) return value.toFixed(1);
+            return Math.round(value).toString();
+        }
+
+        function calculate() {
+            const config = modeConfig[currentMode];
+            let results = [];
+            let validProducts = [];
+
+            products.forEach(p => {
+                const pricePerUnit = calculatePricePerUnit(p.price, p.quantity);
+                results.push({
+                    id: p.id,
+                    label: p.label,
+                    price: p.price,
+                    quantity: p.quantity,
+                    pricePerUnit: pricePerUnit,
+                    hasData: !!(p.price && p.quantity && parseFloat(p.price) > 0 && parseFloat(p.quantity) > 0)
+                });
+                if (pricePerUnit > 0) {
+                    validProducts.push(pricePerUnit);
+                }
+            });
+
+            let minPrice = Infinity;
+            results.forEach(r => {
+                if (r.pricePerUnit > 0 && r.pricePerUnit < minPrice) {
+                    minPrice = r.pricePerUnit;
+                }
+            });
+
+            results.forEach(r => {
+                const priceEl = document.querySelector(`[data-product-id="${r.id}"] .price-value`);
+                const unitEl = document.querySelector(`[data-product-id="${r.id}"] .price-unit`);
+                const badgeEl = document.querySelector(`[data-product-id="${r.id}"] .badges-container`);
+                const cardEl = document.querySelector(`[data-product-id="${r.id}"]`);
+
+                if (r.hasData) {
+                    priceEl.textContent = formatPrice(r.pricePerUnit);
+                    unitEl.textContent = config.resultSuffix;
+                } else {
+                    priceEl.textContent = '—';
+                    unitEl.textContent = '';
+                }
+
+                if (cardEl) cardEl.classList.remove('best-deal');
+                if (badgeEl) badgeEl.innerHTML = '';
+
+                if (r.hasData && r.pricePerUnit === minPrice && validProducts.length > 1) {
+                    if (cardEl) cardEl.classList.add('best-deal');
+                    if (badgeEl) badgeEl.innerHTML = `<span class="best-badge">✓ Дешевле!</span>`;
+                } else if (r.hasData && minPrice < Infinity && r.pricePerUnit > minPrice && validProducts.length > 1) {
+                    const diff = r.pricePerUnit - minPrice;
+                    const diffPercent = Math.round((diff / minPrice) * 100);
+                    if (badgeEl) badgeEl.innerHTML = `<span class="worse-badge">дороже на ${diffPercent}%</span>`;
+                }
+            });
+
+            updateSummary(results, minPrice, validProducts);
+        }
+
+        function updateSummary(results, minPrice, validProducts) {
+            const summaryCard = document.getElementById('summaryCard');
+            const summaryVerdict = document.getElementById('summaryVerdict');
+            const summaryContent = document.getElementById('summaryContent');
+            const summaryBar = document.getElementById('summaryBar');
+
+            const validResults = results.filter(r => r.hasData);
+
+            if (validResults.length < 2) {
+                summaryCard.classList.remove('visible');
+                return;
+            }
+
+            summaryCard.classList.add('visible');
+
+            const sorted = [...validResults].sort((a, b) => a.pricePerUnit - b.pricePerUnit);
+            const best = sorted[0];
+            const worst = sorted[sorted.length - 1];
+            const diff = worst.pricePerUnit - best.pricePerUnit;
+            const diffPercent = Math.round((diff / best.pricePerUnit) * 100);
+            const config = modeConfig[currentMode];
+
+            // Verdict block
+            summaryVerdict.innerHTML = `
+                <div class="summary-verdict">
+                    <div class="verdict-main">
+                        ${best.label} дешевле ${worst.label}
+                    </div>
+                    <div class="verdict-details">
+                        <span class="verdict-detail">на <strong>${diffPercent}%</strong></span>
+                        <span class="verdict-detail">·</span>
+                        <span class="verdict-detail">на <strong>${formatRubles(diff)} ₽/${config.priceDisplay}</strong></span>
+                    </div>
+                </div>
+            `;
+
+            // Table
+            let html = '';
+            sorted.forEach((r, i) => {
+                const isBest = r.pricePerUnit === minPrice;
+                const saving = i === 0 ? null : Math.round((r.pricePerUnit - minPrice) / minPrice * 100);
+                html += `
+                    <div class="summary-row">
+                        <span class="summary-product-name ${isBest ? 'best' : ''}">${r.label}</span>
+                        <div>
+                            <span class="summary-product-price ${isBest ? 'best' : ''}">${formatPrice(r.pricePerUnit)} ₽/${config.priceDisplay}</span>
+                            ${!isBest ? `<span class="summary-saving">+${saving}%</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            summaryContent.innerHTML = html;
+
+            // Bar chart
+            const maxPrice = sorted[sorted.length - 1].pricePerUnit;
+            let barHtml = '<div class="summary-bar-label">Сравнение цен:</div>';
+            sorted.forEach(r => {
+                const width = Math.max(5, (r.pricePerUnit / maxPrice) * 100);
+                const isBest = r.pricePerUnit === minPrice;
+                barHtml += `
+                    <div style="margin-bottom:6px;">
+                        <div class="bar-container">
+                            <div class="bar-fill ${isBest ? 'best' : ''}" style="width:${width}%"></div>
+                        </div>
+                        <div class="bar-labels">
+                            <span>${r.label}</span>
+                            <span>${formatPrice(r.pricePerUnit)} ₽/${config.priceDisplay}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            summaryBar.innerHTML = barHtml;
+        }
+
         function render() {
             const container = document.getElementById('productsContainer');
             const config = modeConfig[currentMode];
-            container.innerHTML = '';
 
-            products.forEach((p) => {
-                const showDelete = products.length > 2;
-                const cardHtml = `
-                    <div class="product-card" data-product-id="${p.id}">
+            container.innerHTML = products.map((product) => {
+                const pricePerUnit = calculatePricePerUnit(product.price, product.quantity);
+                const hasData = !!(product.price && product.quantity && parseFloat(product.price) > 0 && parseFloat(product.quantity) > 0);
+
+                return `
+                    <div class="product-card" data-product-id="${product.id}">
                         <div class="product-card-header">
-                            <div class="product-label">${p.label}</div>
-                            ${showDelete ? `
-                            <button class="delete-btn" onclick="removeProduct(${p.id})">
-                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                            <span class="product-label">${product.label}</span>
+                            ${products.length > 2 ? `<button class="delete-btn" onclick="removeProduct(${product.id})" title="Удалить">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                                 </svg>
-                            </button>` : ''}
+                            </button>` : '<div style="width:28px"></div>'}
                         </div>
                         <div class="product-inputs">
                             <div class="input-row">
                                 <div class="input-group">
-                                    <label>Цена (₽)</label>
-                                    <input type="number" inputmode="decimal" placeholder="0" value="${p.price}" oninput="updateProduct(${p.id}, 'price', this.value)">
+                                    <label>Цена</label>
+                                    <input type="number" placeholder="0" value="${product.price}" 
+                                        oninput="updateProduct(${product.id}, 'price', this.value)"
+                                        onfocus="this.select()">
                                     <span class="input-suffix">₽</span>
                                 </div>
                                 <div class="input-group">
-                                    <label>Объем (${config.inputSuffix})</label>
-                                    <input type="number" inputmode="decimal" placeholder="${config.exampleQty}" value="${p.quantity}" oninput="updateProduct(${p.id}, 'quantity', this.value)">
+                                    <label>${config.inputLabel}</label>
+                                    <input type="number" placeholder="${config.exampleQty}" value="${product.quantity}"
+                                        oninput="updateProduct(${product.id}, 'quantity', this.value)"
+                                        onfocus="this.select()">
                                     <span class="input-suffix">${config.inputSuffix}</span>
                                 </div>
                             </div>
                         </div>
                         <div class="price-result">
                             <div class="price-result-left">
-                                <span class="price-value">0</span>
-                                <span class="price-unit">${config.resultSuffix}</span>
+                                <span class="price-value">${hasData ? formatPrice(pricePerUnit) : '—'}</span>
+                                <span class="price-unit">${hasData ? config.resultSuffix : ''}</span>
                             </div>
-                            <div class="badges-container"></div>
+                            <span class="badges-container"></span>
                         </div>
                     </div>
                 `;
-                container.insertAdjacentHTML('beforeend', cardHtml);
-            });
+            }).join('');
+
             calculate();
         }
 
-        // Подсчет и обновление UI
-        function calculate() {
-            const config = modeConfig[currentMode];
-            let results = [];
-            let minPrice = Infinity;
-            let bestId = null;
-
-            // Находим минимальную цену
-            products.forEach(p => {
-                const pPU = calculatePricePerUnit(p.price, p.quantity);
-                if (pPU > 0) {
-                    if (pPU < minPrice) {
-                        minPrice = pPU;
-                        bestId = p.id;
-                    }
-                    results.push({ id: p.id, pPU });
-                }
-            });
-
-            // Обновляем карточки
-            products.forEach(p => {
-                const cardEl = document.querySelector(`[data-product-id="${p.id}"]`);
-                if (!cardEl) return;
-
-                const pPU = calculatePricePerUnit(p.price, p.quantity);
-                const priceVal = cardEl.querySelector('.price-value');
-                const priceUnit = cardEl.querySelector('.price-unit');
-                const badges = cardEl.querySelector('.badges-container');
-
-                if (pPU > 0) {
-                    priceVal.textContent = formatPrice(pPU);
-                    priceUnit.textContent = config.resultSuffix;
-
-                    if (p.id === bestId && results.length > 1) {
-                        cardEl.classList.add('best-deal');
-                        badges.innerHTML = '<span class="best-badge">Выгодно</span>';
-                    } else {
-                        cardEl.classList.remove('best-deal');
-                        badges.innerHTML = '';
-                    }
-                } else {
-                    priceVal.textContent = '0';
-                    cardEl.classList.remove('best-deal');
-                    badges.innerHTML = '';
-                }
-            });
-
-            updateSummary(results, minPrice, bestId);
-        }
-
-        // Обновление итоговой панели
-        function updateSummary(results, minPrice, bestId) {
-            const summaryCard = document.getElementById('summaryCard');
-            const summaryContent = document.getElementById('summaryContent');
-            
-            if (results.length > 1) {
-                summaryCard.classList.add('visible');
-                let html = '';
-                
-                // Сортируем результаты: лучший сверху
-                results.sort((a, b) => a.pPU - b.pPU).forEach(res => {
-                    const p = products.find(prod => prod.id === res.id);
-                    const isBest = res.id === bestId;
-                    const diff = isBest ? '' : ` <span class="summary-saving">(+${Math.round((res.pPU / minPrice - 1) * 100)}%)</span>`;
-                    
-                    html += `
-                        <div class="summary-row">
-                            <span class="summary-product-name ${isBest ? 'best' : ''}">${p.label}</span>
-                            <span class="summary-product-price ${isBest ? 'best' : ''}">
-                                ${formatPrice(res.pPU)} ${modeConfig[currentMode].resultSuffix} ${diff}
-                            </span>
-                        </div>
-                    `;
-                });
-                summaryContent.innerHTML = html;
-            } else {
-                summaryCard.classList.remove('visible');
+        document.addEventListener('click', (e) => {
+            const selector = document.getElementById('modeSelector');
+            if (!selector.contains(e.target)) {
+                selector.classList.remove('open');
             }
-        }
+        });
+
+        init();
     </script>
 </body>
 </html>
+
