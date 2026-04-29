@@ -2,106 +2,75 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Цены — Калькулятор</title>
-    
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Калькулятор цен","short_name":"Цены","start_url":".","display":"standalone","background_color":"#0a0e14","theme_color":"#0a0e14","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/2311/2311931.png","sizes":"512x512","type":"image/png"}]}'>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0a0e14">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2311/2311931.png">
+    <title>Калькулятор цен</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         :root {
-            --bg-primary: #0a0e14;
-            --bg-card: #1c2130;
-            --bg-input: #12171f;
-            --border-color: #2a3040;
-            --text-primary: #f0f2f5;
-            --text-secondary: #8b93a6;
-            --text-muted: #5a6278;
-            --accent: #7c8aff;
-            --accent-glow: rgba(124, 138, 255, 0.15);
-            --green: #4ade80;
-            --green-glow: rgba(74, 222, 128, 0.12);
-            --red: #f87171;
-            --radius: 16px;
+            --bg: #0a0e14; --card: #1c2130; --input: #12171f;
+            --border: #2a3040; --text: #f0f2f5; --muted: #5a6278;
+            --accent: #7c8aff; --accent-glow: rgba(124, 138, 255, 0.15);
+            --green: #4ade80; --green-glow: rgba(74, 222, 128, 0.12);
+            --red: #f87171; --radius: 16px;
         }
 
-        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; padding: 24px 16px; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px 16px; }
         .app-container { max-width: 480px; margin: 0 auto; }
-        .subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: 20px; }
         
-        /* Mode Selector */
-        .mode-selector { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border-color); margin-bottom: 16px; overflow: hidden; }
+        /* Selector */
+        .mode-selector { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; }
         .mode-header { padding: 16px 20px; display: flex; justify-content: space-between; cursor: pointer; font-weight: 600; }
         .mode-options { max-height: 0; transition: 0.3s ease; overflow: hidden; }
         .open .mode-options { max-height: 200px; }
-        .mode-option { padding: 14px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; font-size: 15px; }
+        .mode-option { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 15px; }
         .mode-option.active { color: var(--accent); }
 
         /* Card */
-        .product-card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 16px; margin-bottom: 12px; transition: 0.3s; }
-        .product-card.best-deal { border-color: var(--green); background: linear-gradient(135deg, var(--bg-card), rgba(74, 222, 128, 0.05)); }
-        .card-head { display: flex; justify-content: space-between; margin-bottom: 12px; color: var(--text-secondary); font-size: 14px; font-weight: 500; }
+        .product-card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 16px; margin-bottom: 12px; transition: 0.3s ease; }
+        .product-card.best-deal { border-color: var(--green); background: linear-gradient(135deg, var(--card), rgba(74, 222, 128, 0.05)); }
+        .card-head { display: flex; justify-content: space-between; margin-bottom: 12px; color: #8b93a6; font-size: 13px; font-weight: 600; text-transform: uppercase; }
         
-        /* Highlighted Inputs */
+        /* Inputs */
         .input-row { display: flex; gap: 10px; }
         .input-group { flex: 1; position: relative; }
-        .input-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-group label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 6px; font-weight: 700; }
         .input-group input { 
-            width: 100%; 
-            padding: 14px 12px; 
-            background: var(--bg-input); 
-            border: 1px solid var(--border-color); 
-            border-radius: 12px; 
-            color: #fff; 
-            font-size: 18px; 
-            font-weight: 600; 
-            outline: none; 
-            transition: all 0.2s ease; 
+            width: 100%; padding: 14px 12px; background: var(--input); border: 1px solid var(--border); 
+            border-radius: 12px; color: #fff; font-size: 18px; font-weight: 600; outline: none; transition: 0.2s; 
         }
-        
-        /* Focus Effect (Active Window) */
-        .input-group input:focus { 
-            border-color: var(--accent); 
-            background: #161c26; 
-            box-shadow: 0 0 0 4px var(--accent-glow);
-        }
-
-        .input-suffix { position: absolute; right: 12px; bottom: 15px; color: var(--text-muted); font-size: 13px; pointer-events: none; }
+        .input-group input:focus { border-color: var(--accent); background: #161c26; box-shadow: 0 0 0 4px var(--accent-glow); }
+        .input-suffix { position: absolute; right: 12px; bottom: 15px; color: var(--muted); font-size: 13px; pointer-events: none; }
 
         /* Results */
         .res-row { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; }
-        .price-val { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+        .price-val { font-size: 22px; font-weight: 700; }
         .best-badge { background: var(--green-glow); color: var(--green); font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
         .worse-badge { color: var(--red); font-size: 12px; font-weight: 500; }
 
-        .add-btn { width: 100%; padding: 16px; background: none; border: 1px dashed var(--border-color); border-radius: var(--radius); color: var(--accent); font-weight: 600; margin-bottom: 24px; cursor: pointer; }
-        
-        /* Summary */
-        .summary { background: var(--bg-card); border-radius: var(--radius); padding: 18px; border: 1px solid var(--border-color); display: none; animation: fadeIn 0.3s ease; }
-        .visible { display: block; }
-        .verdict { background: var(--green-glow); padding: 14px; border-radius: 12px; color: var(--green); font-weight: 600; margin-bottom: 12px; font-size: 15px; }
+        .add-btn { width: 100%; padding: 16px; background: none; border: 1px dashed var(--border); border-radius: var(--radius); color: var(--accent); font-weight: 600; margin-bottom: 24px; }
+        .summary { background: var(--card); border-radius: var(--radius); padding: 18px; border: 1px solid var(--border); display: none; }
+        .visible { display: block; animation: fadeIn 0.3s; }
+        .verdict { background: var(--green-glow); padding: 14px; border-radius: 12px; color: var(--green); font-weight: 600; margin-bottom: 12px; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .delete-btn { color: var(--red); background: rgba(248, 113, 113, 0.1); border: none; width: 24px; height: 24px; border-radius: 50%; font-size: 16px; line-height: 1; cursor: pointer; }
+        .delete-btn { color: var(--red); background: rgba(248, 113, 113, 0.1); border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; }
         input::-webkit-inner-spin-button, input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <p class="subtitle">Сравните ценники и узнайте выгоду.</p>
-
         <div class="mode-selector" id="modeSelector">
             <div class="mode-header" onclick="this.parentElement.classList.toggle('open')">
                 <span>Сравнить <span id="modeLabel" style="color:var(--accent)">за единицу</span></span>
-                <span style="font-size: 12px; opacity: 0.5;">▼</span>
+                <span style="opacity: 0.5;">▼</span>
             </div>
             <div class="mode-options">
                 <div class="mode-option" onclick="setMode('kg')">за килограмм <span>кг</span></div>
@@ -111,25 +80,40 @@
         </div>
 
         <div id="productsContainer"></div>
-        <button class="add-btn" onclick="addProduct()">+ Добавить ещё товар</button>
+        <button class="add-btn" onclick="addProduct()">+ Добавить товар</button>
 
         <div class="summary" id="summaryCard">
             <div id="verdictText" class="verdict"></div>
-            <div id="summaryList"></div>
         </div>
     </div>
 
     <script>
+        // --- PWA КОНФИГУРАЦИЯ (КАК В ПРИМЕРЕ) ---
+        const manifest = {
+            "name": "Калькулятор цен",
+            "short_name": "Цены",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#0a0e14",
+            "theme_color": "#0a0e14",
+            "icons": [{ "src": "https://cdn-icons-png.flaticon.com/512/2311/2311931.png", "sizes": "512x512", "type": "image/png" }]
+        };
+        const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = URL.createObjectURL(blob);
+        document.head.appendChild(link);
+
+        // --- ЛОГИКА ПРИЛОЖЕНИЯ ---
         let mode = 'unit';
         let products = [{ id: 1, p: '', q: '' }, { id: 2, p: '', q: '' }];
-        
         const conf = {
             kg: { label: 'за килограмм', s: 'г', res: '₽/кг', mult: 1000 },
             liter: { label: 'за литр', s: 'мл', res: '₽/л', mult: 1000 },
             unit: { label: 'за единицу', s: 'шт', res: '₽/шт', mult: 1 }
         };
 
-        function haptic(ms) { if (window.navigator && navigator.vibrate) navigator.vibrate(ms); }
+        const haptic = (ms) => { if (navigator.vibrate) navigator.vibrate(ms); };
 
         function setMode(m) {
             mode = m; haptic(15);
@@ -160,66 +144,49 @@
                 const res = (parseFloat(p.p) / parseFloat(p.q)) * conf[mode].mult;
                 return isNaN(res) || res === Infinity || res <= 0 ? 0 : res;
             });
-            const validVals = vals.filter(v => v > 0);
-            const min = validVals.length ? Math.min(...validVals) : Infinity;
+            const valid = vals.filter(v => v > 0);
+            const min = valid.length ? Math.min(...valid) : Infinity;
 
             products.forEach((p, i) => {
                 const card = document.querySelector(`[data-id="${p.id}"]`);
-                const resText = card.querySelector('.price-val');
-                const badge = card.querySelector('.badge-box');
                 const cur = vals[i];
-
                 card.classList.remove('best-deal');
+                const badge = card.querySelector('.badge-box');
                 badge.innerHTML = '';
-
+                
                 if (cur > 0) {
-                    resText.textContent = cur < 10 ? cur.toFixed(2) : Math.round(cur);
-                    if (cur === min && validVals.length > 1) {
+                    card.querySelector('.price-val').textContent = cur < 10 ? cur.toFixed(2) : Math.round(cur);
+                    if (cur === min && valid.length > 1) {
                         card.classList.add('best-deal');
-                        badge.innerHTML = '<span class="best-badge">✓ Дешевле</span>';
+                        badge.innerHTML = '<span class="best-badge">Выгодно</span>';
                     } else if (cur > min && min !== Infinity) {
-                        badge.innerHTML = `<span class="worse-badge">+${Math.round((cur - min) / min * 100)}%</span>`;
+                        badge.innerHTML = `<span class="worse-badge">+${Math.round((cur-min)/min*100)}%</span>`;
                     }
-                } else { resText.textContent = '—'; }
+                } else { card.querySelector('.price-val').textContent = '—'; }
             });
 
-            const sumCard = document.getElementById('summaryCard');
-            if (validVals.length > 1) {
-                sumCard.classList.add('visible');
-                document.getElementById('verdictText').textContent = `Товар ${vals.indexOf(min) + 1} выгоднее остальных`;
-            } else { sumCard.classList.remove('visible'); }
+            const sum = document.getElementById('summaryCard');
+            if (valid.length > 1) {
+                sum.classList.add('visible');
+                document.getElementById('verdictText').textContent = `Товар ${vals.indexOf(min) + 1} самый выгодный`;
+            } else sum.classList.remove('visible');
         }
 
         function render() {
-            const container = document.getElementById('productsContainer');
-            container.innerHTML = products.map((p, i) => `
+            document.getElementById('productsContainer').innerHTML = products.map((p, i) => `
                 <div class="product-card" data-id="${p.id}">
-                    <div class="card-head">
-                        <span>Товар ${i + 1}</span>
+                    <div class="card-head"><span>Товар ${i + 1}</span>
                         ${products.length > 2 ? `<button class="delete-btn" onclick="removeProduct(${p.id})">×</button>` : ''}
                     </div>
                     <div class="input-row">
-                        <div class="input-group">
-                            <label>Цена</label>
-                            <input type="number" value="${p.p}" oninput="update(${p.id}, 'p', this.value)" placeholder="0" inputmode="decimal">
-                            <span class="input-suffix">₽</span>
-                        </div>
-                        <div class="input-group">
-                            <label>${conf[mode].label.split(' ')[1]}</label>
-                            <input type="number" value="${p.q}" oninput="update(${p.id}, 'q', this.value)" placeholder="0" inputmode="decimal">
-                            <span class="input-suffix">${conf[mode].s}</span>
-                        </div>
+                        <div class="input-group"><label>ЦЕНА</label><input type="number" value="${p.p}" oninput="update(${p.id},'p',this.value)" placeholder="0" inputmode="decimal"><span class="input-suffix">₽</span></div>
+                        <div class="input-group"><label>${conf[mode].label.split(' ')[1].toUpperCase()}</label><input type="number" value="${p.q}" oninput="update(${p.id},'q',this.value)" placeholder="0" inputmode="decimal"><span class="input-suffix">${conf[mode].s}</span></div>
                     </div>
-                    <div class="res-row">
-                        <div><span class="price-val">—</span> <small style="color:var(--text-secondary); font-weight:500;">${conf[mode].res}</small></div>
-                        <div class="badge-box"></div>
-                    </div>
-                </div>
-            `).join('');
+                    <div class="res-row"><div><span class="price-val">—</span> <small style="color:var(--muted)">${conf[mode].res}</small></div><div class="badge-box"></div></div>
+                </div>`).join('');
             calculate();
         }
 
-        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(() => {}); }
         render();
     </script>
 </body>
